@@ -16,7 +16,7 @@ public class PlayerBehaviour : MonoBehaviour
     private Vector3 pos;
     private float swerveMag;
 
-    State state = State.Running;
+    State state;
     private void Awake()
     {
         inputRaiser = gameObject.GetComponent<IInputRaiser>();
@@ -26,6 +26,7 @@ public class PlayerBehaviour : MonoBehaviour
     private void Start()
     {
         inputRaiser.Swerve += Swerve;
+        SwitchState(State.Running);
     }
     private void Update()
     {
@@ -33,6 +34,11 @@ public class PlayerBehaviour : MonoBehaviour
         {
             MoveForward();
         }
+    }
+    private void SwitchState(State newState)
+    {
+        state = newState;
+        animator.SetBool(isMovingParamId, true);
     }
     private void MoveForward()
     {

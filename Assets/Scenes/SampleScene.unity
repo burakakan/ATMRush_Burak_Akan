@@ -350,7 +350,7 @@ MonoBehaviour:
   pools:
   - tag: Money
     prefab: {fileID: 740727471968406190, guid: 41eaa9176019ee643954e77650f174cd, type: 3}
-    size: 100
+    size: 2
 --- !u!4 &558557273
 Transform:
   m_ObjectHideFlags: 0
@@ -1074,23 +1074,23 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 1906208207}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 6c45779da32ebab4ab3fd030afa53ee4, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c45779da32ebab4ab3fd030afa53ee4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.7561827
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c45779da32ebab4ab3fd030afa53ee4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.6432009
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c45779da32ebab4ab3fd030afa53ee4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -8.600033
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c45779da32ebab4ab3fd030afa53ee4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1266,37 +1266,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 04385494ebd8b60469be0fc11491f0d0, type: 3}
   m_PrefabInstance: {fileID: 1117478366}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1906208206
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1906208207}
-  m_Layer: 0
-  m_Name: Player
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1906208207
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1906208206}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.7561827, y: -3.6432009, z: 8.600033}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 2040689361}
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1948956129
 GameObject:
   m_ObjectHideFlags: 0
