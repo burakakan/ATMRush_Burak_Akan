@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using static UnityEngine.Mathf;
 
@@ -7,6 +6,7 @@ public class PlayerBehaviour : MonoBehaviour
 {
     [SerializeField]
     private float pace = 10f, maxSwerveSpeed = 15f, swerveLimit = 7.5f;
+    private float swerveMag;
 
     private IInputRaiser inputRaiser;
 
@@ -14,9 +14,9 @@ public class PlayerBehaviour : MonoBehaviour
     private int isMovingParamId; //id of the isMoving parameter
 
     private Vector3 pos;
-    private float swerveMag;
+    public event Action<float> OnMoveForward = delegate { };
 
-    State state;
+State state;
     private void Awake()
     {
         inputRaiser = gameObject.GetComponent<IInputRaiser>();
@@ -43,6 +43,7 @@ public class PlayerBehaviour : MonoBehaviour
     private void MoveForward()
     {
         transform.position += pace * Time.deltaTime * Vector3.forward;
+        OnMoveForward(pace);
     }
     private void Swerve(float swerveInput)
     {

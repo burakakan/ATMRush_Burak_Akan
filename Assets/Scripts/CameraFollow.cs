@@ -3,21 +3,24 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     [SerializeField]
-    private GameObject boy;
+    private Transform character;
     [SerializeField]
     private float smoothTime = 0.5f, lookAhead = 20;
     [SerializeField]
-    private Vector3 offset;
-    private Vector3 velocity;
+    private Vector3 offset, velocity, pos;
+    private float charY;
 
     private void Awake()
     {
         velocity = Vector3.zero;
+        charY = character.position.y;
     }
     private void LateUpdate()
     {
-        transform.position = Vector3.SmoothDamp(transform.position, boy.transform.position + offset, ref velocity, smoothTime);
+        transform.position = Vector3.SmoothDamp(transform.position, character.position + offset, ref velocity, smoothTime);
 
-        transform.LookAt(boy.transform.position + Vector3.forward * lookAhead);
+        pos = transform.position;
+
+        transform.LookAt(new Vector3(pos.x, charY, pos.z + lookAhead));
     }
 }

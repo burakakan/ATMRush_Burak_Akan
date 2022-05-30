@@ -27,6 +27,8 @@ public class StackManager : MonoBehaviour
         stack.Add(stackRoot.gameObject);
         tweens = new List<Tweening>();
         tweens.Add(new Tweening());
+
+        stackRoot.GetComponentInParent<PlayerBehaviour>().OnMoveForward += MoveForward;
     }
 
     private void Update()
@@ -36,13 +38,10 @@ public class StackManager : MonoBehaviour
             trailingItem = stack[i - 1].transform;
             item = stack[i].transform;
 
-            item.position = new Vector3(item.position.x, item.position.y, trailingItem.position.z + offset);
-
-            if (Abs(trailingItem.position.x - item.position.x) < 0.01)
+            if (Abs(trailingItem.position.x - item.position.x) < 0.005)
                 continue;
             tweens[i].MoveX.Kill();
             tweens[i].MoveX = item.DOMoveX(trailingItem.position.x, fetchUpTime);
-
         }
     }
     public void StackCollectible(Collider collider)
@@ -52,8 +51,14 @@ public class StackManager : MonoBehaviour
         tweens.Add(new Tweening());                                 //add an empty tween to the tweens list
         collectible.layer = 7;                                      //switch the item's layer to the stack layer
         collider.isTrigger = false;                                 //stack items' colliders are not triggers
-        collectible.GetComponent<StackedItem>().enabled = true;     //enable collecting capability
+        StackedItem stackedItem = collectible.GetComponent<StackedItem>();
+        stackedItem.enabled = true;                                 //enable collecting capability
+
+        collectible.transform.position = stack[stack.Count - 2].transform.position + offset * Vector3.forward;
         collectible.transform.parent = transform;                   //place it under Stack object for organized hierarchy
+
+        ObjectPooler.Instance.Add(collectible, stackedItem.type);
+
         StartCoroutine(DoPunchWave());
     }
 
@@ -74,6 +79,11 @@ public class StackManager : MonoBehaviour
 
             yield return delay;
         }
+    }
+    
+    private void MoveForward(float pace)
+    {
+        transform.position += pace * Time.deltaTime * Vector3.forward;
     }
     private class Tweening
     {
