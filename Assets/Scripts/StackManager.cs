@@ -14,20 +14,14 @@ public class StackManager : MonoBehaviour
     public static StackManager Instance;
     private void Awake() => Instance = this;
 
-    private List<GameObject> stack;
-    private List<Tweening> tweens;
+    private List<StackElement> stack;
 
     private Transform item, trailingItem;
     private GameObject collectible;
-    private float origScale = 0.4f;
 
     private void Start()
     {
-        stack = new List<GameObject>();
-        stack.Add(stackRoot.gameObject);
-        tweens = new List<Tweening>();
-        tweens.Add(new Tweening());
-
+        stack = new List<StackElement> { new StackElement(stackRoot.gameObject) };
         stackRoot.GetComponentInParent<PlayerBehaviour>().OnMoveForward += MoveForward;
     }
 
@@ -35,64 +29,86 @@ public class StackManager : MonoBehaviour
     {
         for (int i = stack.Count - 1; i > 0; i--)
         {
-            trailingItem = stack[i - 1].transform;
-            item = stack[i].transform;
+            trailingItem = stack[i - 1].GameObject.transform;
+            item = stack[i].GameObject.transform;
 
             if (Abs(trailingItem.position.x - item.position.x) < 0.005)
                 continue;
-            tweens[i].MoveX.Kill();
-            tweens[i].MoveX = item.DOMoveX(trailingItem.position.x, fetchUpTime);
+            stack[i].TweenX.Kill();
+            stack[i].TweenX = item.DOMoveX(trailingItem.position.x, fetchUpTime);
         }
     }
     public void StackCollectible(Collider collider)
     {
         collectible = collider.gameObject;
-        stack.Add(collectible);                                     //add the collected item to the stack list
-        tweens.Add(new Tweening());                                 //add an empty tween to the tweens list
+        stack.Add(new StackElement(collectible));                   //add the collected item to the stack list
         collectible.layer = 7;                                      //switch the item's layer to the stack layer
         collider.isTrigger = false;                                 //stack items' colliders are not triggers
         StackedItem stackedItem = collectible.GetComponent<StackedItem>();
         stackedItem.enabled = true;                                 //enable collecting capability
 
-        collectible.transform.position = stack[stack.Count - 2].transform.position + offset * Vector3.forward;
+        collectible.transform.position = stack[stack.Count - 2].GameObject.transform.position + offset * Vector3.forward;
         collectible.transform.parent = transform;                   //place it under Stack object for organized hierarchy
 
-        ObjectPooler.Instance.Add(collectible, stackedItem.type);
+        ObjectPooler.Instance.Add(collectible, stackedItem.type);   //add the collectible to its respective pool
 
         StartCoroutine(DoPunchWave());
     }
+    public void Replace(GameObject oldObj, GameObject newObj)
+    {
+        int index = stack.FindIndex(e => e.GameObject == oldObj);
+        stack[index].SwitchObject(newObj);
+        DoPunch(index);
+    }
+    public void BreakOff(GameObject element)
+    {
+        ObjectPooler.Instance.Kill(element);
+        int index = stack.FindIndex(e => e.GameObject == element);
 
+        List<StackElement> free = stack.GetRange(index + 1, stack.Count - index - 1);
+
+
+    }
+    private void DoPunch(int index)
+    {
+        //revert to the original scale before the punch tween takes the item's transform as target
+        stack[index].GameObject.transform.localScale = stack[index].OrigScale;
+        //kill the ongoing punch tween
+        stack[index].TweenPunch.Kill();
+        //give the punch
+        stack[index].TweenPunch = stack[index].GameObject.transform.DOPunchScale(stack[index].OrigScale * 0.4f, 0.3f, 6, 0.5f);
+    }
     private IEnumerator DoPunchWave() //performs the sequential scale punch of stack items with the specified delay
     {
         WaitForSeconds delay = new WaitForSeconds(punchScaleDelay);
         for (int i = stack.Count - 1; i > 0; i--)
         {
-            //kill the ongoing punch tween
-            tweens[i].Punch.Kill();
-            //revert to the original scale before the punch tween takes the item's transform as target
-            stack[i].transform.localScale = origScale * Vector3.one;
-            //give the punch
-            tweens[i].Punch = stack[i].transform.DOPunchScale(Vector3.one * 0.15f, 0.3f, 6, 0.5f);
-
-            ////give the current punch and fix the scale after tween completion
-            //tweens[i].Punch = stack[i].transform.DOPunchScale(Vector3.one * 0.15f, 0.3f, 6, 0.5f).OnComplete(() => tweens[i].Punch = stack[i].transform.DOScale(Vector3.one * origScale, 0.25f));
-
+            DoPunch(i);
             yield return delay;
         }
     }
-    
     private void MoveForward(float pace)
     {
         transform.position += pace * Time.deltaTime * Vector3.forward;
     }
-    private class Tweening
+    private class StackElement
     {
-        public Tweening()
+        public StackElement(GameObject obj)
         {
-            MoveX = DOVirtual.DelayedCall(1, () => { });
-            Punch = DOVirtual.DelayedCall(1, () => { });
+            GameObject = obj;
+            TweenX = DOVirtual.DelayedCall(1, () => { });
+            TweenPunch = DOVirtual.DelayedCall(1, () => { });
+            OrigScale = obj.transform.localScale;
         }
-        public Tween MoveX { get; set; }
-        public Tween Punch { get; set; }
+        public GameObject GameObject { get; set; }
+        public Tween TweenX { get; set; }
+        public Tween TweenPunch { get; set; }
+        public Vector3 OrigScale { get; set; }
+
+        public void SwitchObject(GameObject newObj)
+        {
+            GameObject = newObj;
+            OrigScale = newObj.transform.localScale;
+        }
     }
 }

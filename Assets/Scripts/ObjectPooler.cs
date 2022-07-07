@@ -44,11 +44,9 @@ public class ObjectPooler : MonoBehaviour
     {
         //get object from the pool
         GameObject gameObject = poolDictionary[type].Dequeue();
-
         //activate and set the specified transform
         gameObject.SetActive(true);
-        gameObject.transform.position = position;
-        gameObject.transform.rotation = rotation;
+        gameObject.transform.SetPositionAndRotation(position, rotation);
         //put it at the back of the queue
         poolDictionary[type].Enqueue(gameObject);
 

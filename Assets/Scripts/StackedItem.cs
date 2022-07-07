@@ -7,25 +7,42 @@ public class StackedItem : MonoBehaviour
 {
     public ObjectPooler.ObjectType type;
 
+    private GameObject trigObject;
+    private int trigLayer;
     private void Start()
     {
-
+        
     }
     
     private void OnTriggerEnter(Collider collider)
     {
-        int triglayer = collider.gameObject.layer;
-        if (triglayer == 6) //if the object is in the collectible layer
-            StackManager.Instance.StackCollectible(collider);
-
-        if (triglayer == 8 && (int)type < 2) //upgrade layer
-            Upgrade();
+        trigLayer = collider.gameObject.layer;
+        switch (trigLayer)
+        {
+            case 6:      //if the object is in the collectible layer
+                StackManager.Instance.StackCollectible(collider);
+                break;
+            case 8:     //upgrade layer
+                Upgrade();
+                break;
+            case 10:    //atm layer
+                //Deposit(collider.gameObject);
+                break;
+            default:
+                break;
+        }
+            
     }
 
-    public void Upgrade()
+    private void Upgrade()
     {
-        //ObjectPooler.Instance.Kill(gameObject);
-        //ObjectPooler.Instance.Spawn(type + 1, transform.position, transform.rotation);
+        ObjectPooler.Instance.Kill(gameObject);
+        GameObject upgrade = ObjectPooler.Instance.Spawn(type + 1, transform.position, transform.rotation);
+        upgrade.transform.SetParent(StackManager.Instance.transform, true);
+        StackManager.Instance.Replace(gameObject, upgrade);
     }
-
+    private void Deposit()
+    {
+        ObjectPooler.Instance.Kill(gameObject);
+    }
 }
